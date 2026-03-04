@@ -1,0 +1,603 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sectionHeader {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: 0 4px;
+}
+
+.vectorSection {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Add Segment Form */
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addFormRow {
+  display: flex;
+  gap: 8px;
+}
+
+.inputWrapper {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+}
+
+.input {
+  flex: 1;
+  padding: 6px 8px;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 13px;
+  min-width: 0;
+}
+
+.input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+/* Buttons */
+.btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  padding: 6px 14px;
+  min-height: 44px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btnPrimary:hover {
+  background: var(--accent-hover);
+}
+
+.formError {
+  font-size: 12px;
+  color: var(--danger);
+  padding: 0 2px;
+}
+
+.btnDanger {
+  padding: 6px 12px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btnDanger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Action Bar */
+.actionBar {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBar > button {
+  min-height: 44px;
+  flex: 1;
+}
+
+/* Segment List */
+.segmentList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Vector info panel */
+.vectorInfo {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.vectorHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.vectorPointLabel {
+  font-size: 12px;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80px;
+}
+
+.vectorArrow {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.vectorPrimary {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.vectorSecondary {
+  font-size: 10px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+/* Point badge */
+.pointBadge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.pointBadgeSm {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* RouteEntry */
+.routeEntry {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Entry header — point row */
+.entryHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px;
+  min-height: 44px;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.entryHeaderSelected {
+  background: rgba(34, 197, 94, 0.18);
+  border-left: 3px solid rgba(34, 197, 94, 0.8);
+  padding-left: 1px; /* 4px - 3px border */
+}
+
+.entryLabel {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entryLabelInput {
+  flex: 1;
+  padding: 4px 6px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 0;
+  max-width: 120px;
+  box-sizing: border-box;
+}
+
+.entryLabelInput:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.entryLabelEditable {
+  cursor: pointer;
+  border-bottom: 1px solid var(--text-secondary);
+  min-width: 40px;
+}
+
+.entryLabelEditable:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* FROM/TO chips */
+.chipGroup {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid;
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+}
+
+.chipFromActive {
+  background: var(--from-color);
+  border-color: var(--from-color);
+  color: #fff;
+}
+
+.chipFromInactive {
+  background: transparent;
+  border-color: var(--from-color);
+  color: var(--from-color);
+}
+
+.chipToActive {
+  background: var(--to-color);
+  border-color: var(--to-color);
+  color: #fff;
+}
+
+.chipToInactive {
+  background: transparent;
+  border-color: var(--to-color);
+  color: var(--to-color);
+}
+
+/* Entry leg — segment detail */
+.entryLeg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.entryLegSelected {
+  background: rgba(245, 158, 11, 0.15);
+  border-left: 3px solid rgba(245, 158, 11, 0.8);
+  padding-left: 1px;
+}
+
+.legConnector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+  width: 24px;
+  flex-shrink: 0;
+  padding: 2px 0;
+}
+
+.legConnectorLine {
+  width: 1.5px;
+  flex: 1;
+  min-height: 12px;
+  background: var(--text-secondary);
+  opacity: 0.4;
+}
+
+.legConnectorArrow {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--text-secondary);
+  opacity: 0.4;
+}
+
+.legContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.legPrimary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.legSecondary {
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  padding-left: 2px;
+}
+
+.legEditable {
+  cursor: pointer;
+  border-bottom: 1px solid var(--text-secondary);
+}
+
+.legEditable:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.legInlineInput {
+  padding: 2px 4px;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  background: var(--bg);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  width: 70px;
+}
+
+.legDeleteBtn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  color: var(--danger);
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: auto;
+  line-height: 1;
+}
+
+.legDeleteBtn:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+.legDeleteBtn:active {
+  background: var(--danger);
+  color: #fff;
+  transform: scale(0.95);
+}
+
+.legDeleteConfirm {
+  height: 44px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--danger);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: auto;
+  line-height: 1;
+}
+
+.legDeleteConfirm:active {
+  filter: brightness(0.85);
+  transform: scale(0.95);
+}
+
+/* Selection tags */
+.selectionTag {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(34, 197, 94, 0.9);
+  background: rgba(34, 197, 94, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.selectionTagLeg {
+  color: rgba(245, 158, 11, 0.9);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* Settings Panel */
+.settingsPanel {
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.settingsToggle {
+  width: 100%;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.settingsChevron {
+  display: inline-block;
+  transition: transform 200ms ease;
+  font-size: 10px;
+}
+
+.settingsToggle[data-state='open'] .settingsChevron {
+  transform: rotate(180deg);
+}
+
+.settingsContent {
+  overflow: hidden;
+}
+
+.settingsContent[data-state='open'] {
+  animation: collapsibleOpen 200ms ease;
+}
+
+.settingsContent[data-state='closed'] {
+  animation: collapsibleClose 200ms ease;
+}
+
+.settingsBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.settingInput {
+  width: 100px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 13px;
+}
+
+.routeHint {
+  font-size: 10px;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  padding: 0 4px;
+  margin-top: -2px;
+}
+
+/* Empty state */
+.emptyState {
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .input,
+  .settingInput,
+  .entryLabelInput,
+  .legInlineInput {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .vectorInfo {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes collapsibleOpen {
+  from { height: 0; }
+  to { height: var(--radix-collapsible-content-height); }
+}
+
+@keyframes collapsibleClose {
+  from { height: var(--radix-collapsible-content-height); }
+  to { height: 0; }
+}

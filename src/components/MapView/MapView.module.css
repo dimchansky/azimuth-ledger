@@ -1,0 +1,31 @@
+.fitBtn {
+  position: absolute;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  color: var(--text);
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.fitBtn:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.fitBtn:active:not(:disabled) {
+  transform: scale(0.95);
+  background: var(--border);
+}
+
+.fitBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

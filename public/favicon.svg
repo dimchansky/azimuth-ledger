@@ -1,0 +1,29 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <circle cx="256" cy="256" r="256" fill="#1a1a2e"/>
+  <!-- Compass ring -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#475569" stroke-width="14"/>
+  <!-- Cardinal tick marks -->
+  <line x1="256" y1="62" x2="256" y2="96" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+  <line x1="256" y1="416" x2="256" y2="450" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+  <line x1="62" y1="256" x2="96" y2="256" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+  <line x1="416" y1="256" x2="450" y2="256" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+  <!-- North indicator -->
+  <polygon points="256,42 242,72 270,72" fill="#e74c3c"/>
+  <!-- Route segments as individual lines -->
+  <line x1="150" y1="350" x2="215" y2="200" stroke="#22c55e" stroke-width="12" stroke-linecap="round"/>
+  <line x1="215" y1="200" x2="320" y2="245" stroke="#22c55e" stroke-width="12" stroke-linecap="round"/>
+  <line x1="320" y1="245" x2="375" y2="145" stroke="#22c55e" stroke-width="12" stroke-linecap="round"/>
+  <!-- Arrowhead -->
+  <polygon points="382,132 358,158 372,168" fill="#22c55e"/>
+  <!-- Route nodes - outer -->
+  <circle cx="150" cy="350" r="16" fill="#22c55e"/>
+  <circle cx="215" cy="200" r="16" fill="#22c55e"/>
+  <circle cx="320" cy="245" r="16" fill="#22c55e"/>
+  <circle cx="375" cy="145" r="16" fill="#22c55e"/>
+  <!-- Route nodes - inner -->
+  <circle cx="150" cy="350" r="7" fill="#ffffff"/>
+  <circle cx="215" cy="200" r="7" fill="#ffffff"/>
+  <circle cx="320" cy="245" r="7" fill="#ffffff"/>
+  <circle cx="375" cy="145" r="7" fill="#ffffff"/>
+</svg>
