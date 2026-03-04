@@ -2,6 +2,8 @@
 
 Offline-first PWA for dead-reckoning navigation: log a route as magnetic azimuth + length vectors and visualize it as a 2D map with North up.
 
+**[Live Demo](https://dimchansky.github.io/azimuth-ledger/)**
+
 ## Features
 
 - Record route legs with magnetic azimuth and length
