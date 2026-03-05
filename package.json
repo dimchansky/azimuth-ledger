@@ -15,8 +15,10 @@
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-visually-hidden": "^1.2.4",
+    "konva": "^10.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-konva": "^19.2.3",
     "zustand": "^5.0.0"
   },
   "devDependencies": {

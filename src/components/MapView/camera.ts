@@ -6,32 +6,6 @@ export interface Camera {
   scale: number;
 }
 
-export function worldToScreen(
-  wx: number,
-  wy: number,
-  cam: Camera,
-  canvasW: number,
-  canvasH: number,
-): { sx: number; sy: number } {
-  return {
-    sx: (wx - cam.offsetX) * cam.scale + canvasW / 2,
-    sy: (cam.offsetY - wy) * cam.scale + canvasH / 2, // Y flipped
-  };
-}
-
-export function screenToWorld(
-  sx: number,
-  sy: number,
-  cam: Camera,
-  canvasW: number,
-  canvasH: number,
-): { wx: number; wy: number } {
-  return {
-    wx: (sx - canvasW / 2) / cam.scale + cam.offsetX,
-    wy: cam.offsetY - (sy - canvasH / 2) / cam.scale,
-  };
-}
-
 export function fitBounds(
   points: Point[],
   canvasW: number,

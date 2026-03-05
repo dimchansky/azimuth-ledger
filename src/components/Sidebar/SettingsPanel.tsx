@@ -1,5 +1,6 @@
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { useSettingsStore } from '../../store/settingsStore';
+import type { ThemePreference } from '../../store/settingsStore';
 import styles from './Sidebar.module.css';
 
 export function SettingsPanel() {
@@ -8,11 +9,13 @@ export function SettingsPanel() {
   const milsPerCircle = useSettingsStore((s) => s.milsPerCircle);
   const gridStep = useSettingsStore((s) => s.gridStep);
   const unitsLabel = useSettingsStore((s) => s.unitsLabel);
+  const themePreference = useSettingsStore((s) => s.themePreference);
   const setDeclinationDeg = useSettingsStore((s) => s.setDeclinationDeg);
   const setAngleUnit = useSettingsStore((s) => s.setAngleUnit);
   const setMilsPerCircle = useSettingsStore((s) => s.setMilsPerCircle);
   const setGridStep = useSettingsStore((s) => s.setGridStep);
   const setUnitsLabel = useSettingsStore((s) => s.setUnitsLabel);
+  const setThemePreference = useSettingsStore((s) => s.setThemePreference);
 
   return (
     <Collapsible.Root className={styles.settingsPanel}>
@@ -21,6 +24,18 @@ export function SettingsPanel() {
       </Collapsible.Trigger>
       <Collapsible.Content className={styles.settingsContent}>
         <div className={styles.settingsBody}>
+          <label className={styles.settingRow}>
+            <span>Theme</span>
+            <select
+              value={themePreference}
+              onChange={(e) => setThemePreference(e.target.value as ThemePreference)}
+              className={styles.settingInput}
+            >
+              <option value="auto">Auto</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
           <label className={styles.settingRow}>
             <span>Declination (°)</span>
             <input

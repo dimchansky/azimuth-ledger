@@ -4,15 +4,14 @@ import styles from './App.module.css';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { MapView } from './components/MapView/MapView';
 import { useMediaQuery } from './hooks/useMediaQuery';
-import { useMapSelectionStore } from './store/mapSelectionStore';
+import { useThemeEffect } from './hooks/useThemeEffect';
 import { useState, useRef } from 'react';
 
 export function App() {
+  useThemeEffect();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const mapSelection = useMapSelectionStore((s) => s.mapSelection);
-
   return (
     <div className={styles.app}>
       {isMobile && (
@@ -32,10 +31,8 @@ export function App() {
               className={styles.drawer}
               aria-label="Navigation"
               onOpenAutoFocus={(e) => {
-                if (mapSelection) {
-                  e.preventDefault();
-                  closeRef.current?.focus();
-                }
+                e.preventDefault();
+                closeRef.current?.focus();
               }}
             >
               <VisuallyHidden.Root>

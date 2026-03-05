@@ -1,33 +1,31 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
+import { Stage, Layer } from 'react-konva';
+import type Konva from 'konva';
 import { useRouteStore } from '../../store/routeStore';
 import { useSettingsStore } from '../../store/settingsStore';
-import { useViewStore } from '../../store/viewStore';
+import { useViewStore, MIN_SCALE, MAX_SCALE } from '../../store/viewStore';
 import { useMapSelectionStore } from '../../store/mapSelectionStore';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { computePoints, magneticToTrue } from '../../domain/navigation';
-import { render } from './renderer';
-import { fitBounds, worldToScreen } from './camera';
-import { useCanvasInteraction } from './useCanvasInteraction';
+import { fitBounds } from './camera';
+import { GridLayer } from './components/GridLayer';
+import { RouteSegments, SelectedLegCard } from './components/RouteSegments';
+import { PointBadges } from './components/PointBadges';
+import { FromToVectorArrow, FromToVectorLabel } from './components/FromToVector';
+import { NorthArrow } from './components/NorthArrow';
 import mapStyles from './MapView.module.css';
 
-function pointToSegmentDist(
-  px: number, py: number,
-  ax: number, ay: number,
-  bx: number, by: number,
-): number {
-  const dx = bx - ax;
-  const dy = by - ay;
-  const lenSq = dx * dx + dy * dy;
-  if (lenSq === 0) return Math.hypot(px - ax, py - ay);
-  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lenSq));
-  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+interface Pointer {
+  id: number;
+  x: number;
+  y: number;
 }
 
 export function MapView() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const stageRef = useRef<Konva.Stage>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number>(0);
   const prevPointCountRef = useRef(0);
-  const [canvasSize, setCanvasSize] = useState({ w: 0, h: 0 });
+  const [containerSize, setContainerSize] = useState({ w: 0, h: 0 });
 
   const mapSelection = useMapSelectionStore((s) => s.mapSelection);
   const setMapSelection = useMapSelectionStore((s) => s.setMapSelection);
@@ -50,6 +48,11 @@ export function MapView() {
   const setView = useViewStore((s) => s.setView);
   const setUserInteracted = useViewStore((s) => s.setUserInteracted);
 
+  // Subscribe to theme changes to trigger re-render of Konva shapes that read CSS variables
+  const themePreference = useSettingsStore((s) => s.themePreference);
+  useMediaQuery('(prefers-color-scheme: dark)');
+  void themePreference;
+
   const points = computePoints(segments, originLabel, declinationDeg);
 
   const segmentAzimuths = segments.map((seg) => ({
@@ -57,110 +60,32 @@ export function MapView() {
     trueAzimuth: magneticToTrue(seg.magneticAzimuth, declinationDeg),
   }));
 
+  const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+
+  // Stage dimensions in CSS pixels — Konva handles DPR via pixelRatio
+  const stageW = containerSize.w;
+  const stageH = containerSize.h;
+
   const handleFit = useCallback(() => {
     const container = containerRef.current;
     const w = container?.clientWidth ?? window.innerWidth;
     const h = container?.clientHeight ?? window.innerHeight;
-    const dpr = window.devicePixelRatio || 1;
-    const pad = 60 * dpr;
-    const cam = fitBounds(points, w * dpr, h * dpr, pad);
+    const cam = fitBounds(points, w, h, 60);
     setView(cam.offsetX, cam.offsetY, cam.scale);
   }, [points, setView]);
 
   // Auto-fit when points count increases and user hasn't interacted
   useEffect(() => {
-    if (canvasSize.w === 0) return; // wait for canvas to be sized
+    if (containerSize.w === 0) return;
 
     const prevCount = prevPointCountRef.current;
     prevPointCountRef.current = points.length;
 
     if (points.length > prevCount && !userHasInteracted) {
-      const dpr = window.devicePixelRatio || 1;
-      const pad = 60 * dpr;
-      const cam = fitBounds(points, canvasSize.w, canvasSize.h, pad);
+      const cam = fitBounds(points, containerSize.w, containerSize.h, 60);
       setView(cam.offsetX, cam.offsetY, cam.scale);
     }
-  }, [points.length, userHasInteracted, setView, points, canvasSize]);
-
-  const getCamera = useCallback(
-    () => ({ offsetX, offsetY, scale }),
-    [offsetX, offsetY, scale],
-  );
-
-  const setCamera = useCallback(
-    (cam: { offsetX: number; offsetY: number; scale: number }) => {
-      setView(cam.offsetX, cam.offsetY, cam.scale);
-    },
-    [setView],
-  );
-
-  const onInteraction = useCallback(() => {
-    if (!userHasInteracted) setUserInteracted();
-  }, [userHasInteracted, setUserInteracted]);
-
-  const handleCanvasClick = useCallback(
-    (cssX: number, cssY: number) => {
-      const dpr = window.devicePixelRatio || 1;
-      const cam = { offsetX, offsetY, scale };
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const cW = canvas.width;
-      const cH = canvas.height;
-
-      // Check points first (smaller targets, higher priority)
-      let bestPointDist = Infinity;
-      let bestPointIdx: number | null = null;
-      for (const p of points) {
-        const s = worldToScreen(p.x, p.y, cam, cW, cH);
-        const d = Math.hypot(cssX - s.sx / dpr, cssY - s.sy / dpr);
-        if (d < bestPointDist) {
-          bestPointDist = d;
-          bestPointIdx = p.index;
-        }
-      }
-      if (bestPointDist <= 20 && bestPointIdx !== null) {
-        if (mapSelection?.type === 'point' && mapSelection.index === bestPointIdx) {
-          setMapSelection(null);
-        } else {
-          setMapSelection({ type: 'point', index: bestPointIdx });
-        }
-        return;
-      }
-
-      // Check legs
-      if (points.length >= 2) {
-        let bestLegDist = Infinity;
-        let bestLegIdx: number | null = null;
-        for (let i = 0; i < points.length - 1; i++) {
-          const s1 = worldToScreen(points[i].x, points[i].y, cam, cW, cH);
-          const s2 = worldToScreen(points[i + 1].x, points[i + 1].y, cam, cW, cH);
-          const d = pointToSegmentDist(
-            cssX, cssY,
-            s1.sx / dpr, s1.sy / dpr,
-            s2.sx / dpr, s2.sy / dpr,
-          );
-          if (d < bestLegDist) {
-            bestLegDist = d;
-            bestLegIdx = i;
-          }
-        }
-        if (bestLegDist <= 20 && bestLegIdx !== null) {
-          if (mapSelection?.type === 'leg' && mapSelection.index === bestLegIdx) {
-            setMapSelection(null);
-          } else {
-            setMapSelection({ type: 'leg', index: bestLegIdx });
-          }
-          return;
-        }
-      }
-
-      // Empty space → deselect
-      setMapSelection(null);
-    },
-    [points, offsetX, offsetY, scale, mapSelection, setMapSelection],
-  );
-
-  const interaction = useCanvasInteraction({ getCamera, setCamera, onInteraction, onClick: handleCanvasClick });
+  }, [points.length, userHasInteracted, setView, points, containerSize]);
 
   // Reset selection when out of bounds
   useEffect(() => {
@@ -171,7 +96,7 @@ export function MapView() {
     }
   }, [mapSelection, segments.length, points.length, setMapSelection]);
 
-  // Canvas resize — updates state to trigger re-render
+  // Container resize observer
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -179,19 +104,7 @@ export function MapView() {
     const obs = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        const dpr = window.devicePixelRatio || 1;
-        const w = width * dpr;
-        const h = height * dpr;
-
-        const canvas = canvasRef.current;
-        if (canvas) {
-          canvas.width = w;
-          canvas.height = h;
-          canvas.style.width = `${width}px`;
-          canvas.style.height = `${height}px`;
-        }
-
-        setCanvasSize({ w, h });
+        setContainerSize({ w: width, h: height });
       }
     });
 
@@ -199,52 +112,258 @@ export function MapView() {
     return () => obs.disconnect();
   }, []);
 
-  // Render on every relevant state change
+  // --- Pointer interaction (pan, pinch, click) ---
+  const pointersRef = useRef<Pointer[]>([]);
+  const lastPinchDistRef = useRef<number | null>(null);
+  const lastPinchMidRef = useRef<{ x: number; y: number } | null>(null);
+  const downPosRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    (e.target as Element).setPointerCapture(e.pointerId);
+    pointersRef.current.push({ id: e.pointerId, x: e.clientX, y: e.clientY });
+    lastPinchDistRef.current = null;
+    lastPinchMidRef.current = null;
+    if (pointersRef.current.length === 1) {
+      downPosRef.current = { x: e.clientX, y: e.clientY };
+    } else {
+      downPosRef.current = null;
+    }
+  }, []);
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      const idx = pointersRef.current.findIndex((p) => p.id === e.pointerId);
+      if (idx === -1) return;
+
+      if (pointersRef.current.length === 1) {
+        // Single pointer drag → pan
+        const prev = pointersRef.current[0];
+        const dx = e.clientX - prev.x;
+        const dy = e.clientY - prev.y;
+        prev.x = e.clientX;
+        prev.y = e.clientY;
+
+        // dx/dy in CSS pixels, scale is CSS pixels per world unit
+        setView(
+          offsetX - dx / scale,
+          offsetY + dy / scale, // Y flipped
+          scale,
+        );
+        if (!userHasInteracted) setUserInteracted();
+      } else if (pointersRef.current.length === 2) {
+        // Update the moved pointer
+        const p = pointersRef.current[idx];
+        p.x = e.clientX;
+        p.y = e.clientY;
+
+        const [p1, p2] = pointersRef.current;
+        const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        const midX = (p1.x + p2.x) / 2;
+        const midY = (p1.y + p2.y) / 2;
+
+        if (lastPinchDistRef.current !== null && lastPinchMidRef.current !== null) {
+          const ratio = dist / lastPinchDistRef.current;
+          const newScale = Math.min(Math.max(scale * ratio, MIN_SCALE), MAX_SCALE);
+
+          const dmx = midX - lastPinchMidRef.current.x;
+          const dmy = midY - lastPinchMidRef.current.y;
+
+          setView(
+            offsetX - dmx / newScale,
+            offsetY + dmy / newScale,
+            newScale,
+          );
+          if (!userHasInteracted) setUserInteracted();
+        }
+
+        lastPinchDistRef.current = dist;
+        lastPinchMidRef.current = { x: midX, y: midY };
+      }
+    },
+    [offsetX, offsetY, scale, setView, userHasInteracted, setUserInteracted],
+  );
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      // Detect click: pointerDown + pointerUp within 5 CSS pixels
+      if (downPosRef.current) {
+        const dx = e.clientX - downPosRef.current.x;
+        const dy = e.clientY - downPosRef.current.y;
+        if (Math.sqrt(dx * dx + dy * dy) < 5) {
+          const stage = stageRef.current;
+          if (stage) {
+            const rect = stage.container().getBoundingClientRect();
+            const sx = e.clientX - rect.left;
+            const sy = e.clientY - rect.top;
+            const shape = stage.getIntersection({ x: sx, y: sy });
+
+            if (shape) {
+              const name = shape.name();
+              if (name.startsWith('point-')) {
+                const pidx = parseInt(name.replace('point-', ''), 10);
+                if (mapSelection?.type === 'point' && mapSelection.index === pidx) {
+                  setMapSelection(null);
+                } else {
+                  setMapSelection({ type: 'point', index: pidx });
+                }
+              } else if (name.startsWith('leg-')) {
+                const lidx = parseInt(name.replace('leg-', ''), 10);
+                if (mapSelection?.type === 'leg' && mapSelection.index === lidx) {
+                  setMapSelection(null);
+                } else {
+                  setMapSelection({ type: 'leg', index: lidx });
+                }
+              } else {
+                setMapSelection(null);
+              }
+            } else {
+              setMapSelection(null);
+            }
+          }
+        }
+      }
+      downPosRef.current = null;
+
+      pointersRef.current = pointersRef.current.filter((p) => p.id !== e.pointerId);
+      if (pointersRef.current.length < 2) {
+        lastPinchDistRef.current = null;
+        lastPinchMidRef.current = null;
+      }
+    },
+    [mapSelection, setMapSelection],
+  );
+
+  // Wheel zoom — registered via useEffect for non-passive listener
   useEffect(() => {
-    if (canvasSize.w === 0 || canvasSize.h === 0) return;
+    const container = containerRef.current;
+    if (!container) return;
 
-    const draw = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+      const factor = e.deltaY > 0 ? 0.9 : 1.1;
+      const curScale = useViewStore.getState().scale;
+      const curOffsetX = useViewStore.getState().offsetX;
+      const curOffsetY = useViewStore.getState().offsetY;
+      const newScale = Math.min(Math.max(curScale * factor, MIN_SCALE), MAX_SCALE);
 
-      render({
-        ctx,
-        cam: { offsetX, offsetY, scale },
-        canvasW: canvas.width,
-        canvasH: canvas.height,
-        points,
-        selection,
-        declinationDeg,
-        angleUnit,
-        milsPerCircle,
-        gridStep,
-        segmentAzimuths,
-        selectedLegIndex,
-        selectedPointIndex,
-        segments,
-        unitsLabel,
-      });
+      const stage = stageRef.current;
+      if (!stage) return;
+
+      const rect = stage.container().getBoundingClientRect();
+      // CSS pixel coordinates
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      const sW = rect.width;
+      const sH = rect.height;
+
+      // World position under cursor before zoom
+      const wxBefore = (cx - sW / 2) / curScale + curOffsetX;
+      const wyBefore = curOffsetY - (cy - sH / 2) / curScale;
+
+      // World position under cursor after zoom
+      const wxAfter = (cx - sW / 2) / newScale + curOffsetX;
+      const wyAfter = curOffsetY - (cy - sH / 2) / newScale;
+
+      const { setView: sv, setUserInteracted: sui } = useViewStore.getState();
+      sv(
+        curOffsetX - (wxAfter - wxBefore),
+        curOffsetY - (wyAfter - wyBefore),
+        newScale,
+      );
+      if (!useViewStore.getState().userHasInteracted) sui();
     };
 
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(draw);
-
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [canvasSize, offsetX, offsetY, scale, points, selection, declinationDeg, angleUnit, milsPerCircle, gridStep, segmentAzimuths, selectedLegIndex, selectedPointIndex, segments, unitsLabel]);
+    container.addEventListener('wheel', handler, { passive: false });
+    return () => container.removeEventListener('wheel', handler);
+  }, []);
 
   return (
-    <div ref={containerRef} data-map-container style={{ width: '100%', height: '100%', position: 'relative' }}>
-      <canvas
-        ref={canvasRef}
-        style={{ display: 'block', touchAction: 'none' }}
-        onPointerDown={interaction.onPointerDown}
-        onPointerMove={interaction.onPointerMove}
-        onPointerUp={interaction.onPointerUp}
-        onPointerCancel={interaction.onPointerUp}
-        onWheel={interaction.onWheel}
-      />
+    <div
+      ref={containerRef}
+      data-map-container
+      style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', touchAction: 'none' }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+    >
+      {stageW > 0 && stageH > 0 && (
+        <Stage
+          ref={stageRef}
+          width={stageW}
+          height={stageH}
+          pixelRatio={dpr}
+        >
+          {/* Background layer: grid (non-transformed, raw screen coords) */}
+          <Layer listening={false}>
+            <GridLayer
+              offsetX={offsetX}
+              offsetY={offsetY}
+              scale={scale}
+              width={stageW}
+              height={stageH}
+              gridStep={gridStep}
+            />
+          </Layer>
+
+          {/* Route layer: segments + badges (transformed to world coords) */}
+          <Layer
+            offsetX={offsetX - stageW / (2 * scale)}
+            offsetY={-offsetY - stageH / (2 * scale)}
+            scaleX={scale}
+            scaleY={scale}
+          >
+            <RouteSegments
+              points={points}
+              selectedLegIndex={selectedLegIndex}
+              scale={scale}
+            />
+            <FromToVectorArrow
+              points={points}
+              selection={selection}
+              scale={scale}
+            />
+            <PointBadges
+              points={points}
+              selection={selection}
+              selectedPointIndex={selectedPointIndex}
+              scale={scale}
+            />
+          </Layer>
+
+          {/* Overlay layer: labels/cards in screen space */}
+          <Layer listening={false}>
+            <FromToVectorLabel
+              points={points}
+              selection={selection}
+              declinationDeg={declinationDeg}
+              angleUnit={angleUnit}
+              milsPerCircle={milsPerCircle}
+              unitsLabel={unitsLabel}
+              scale={scale}
+              stageWidth={stageW}
+              stageHeight={stageH}
+              offsetX={offsetX}
+              offsetY={offsetY}
+            />
+            <SelectedLegCard
+              points={points}
+              selectedLegIndex={selectedLegIndex}
+              scale={scale}
+              segments={segments}
+              segmentAzimuths={segmentAzimuths}
+              angleUnit={angleUnit}
+              milsPerCircle={milsPerCircle}
+              unitsLabel={unitsLabel}
+              stageWidth={stageW}
+              stageHeight={stageH}
+              offsetX={offsetX}
+              offsetY={offsetY}
+            />
+            <NorthArrow stageWidth={stageW} />
+          </Layer>
+        </Stage>
+      )}
       <button
         className={mapStyles.fitBtn}
         onClick={handleFit}

@@ -69,6 +69,15 @@
   cursor: pointer;
 }
 
+.cancel:hover {
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.cancel:active,
+.confirm:active {
+  transform: scale(0.97);
+}
+
 .confirm:hover {
   background: var(--danger-hover);
 }

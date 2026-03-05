@@ -19,24 +19,66 @@
   --from-color: #2563eb;
   --to-color: #dc2626;
   --segment-color: #333;
-  --grid-color: #e0e0e0;
+  --grid-color: #c8c8c8;
   --point-color: #666;
+  --vector-color: #d97706;
+  --vector-label-bg: rgba(20,8,0,0.80);
   --radius: 6px;
   --font: system-ui, -apple-system, sans-serif;
   --font-mono: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  --selection-point: 34, 197, 94;
+  --selection-leg: 245, 158, 11;
+  --selection-glow: rgba(22, 163, 74, 0.8);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
+/* Auto dark mode — only when no manual override */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --bg: #1a1a2e;
     --bg-surface: #16213e;
     --text: #e0e0e0;
     --text-secondary: #999;
     --border: #333;
-    --grid-color: #2a2a3e;
+    --grid-color: #3d3d56;
     --segment-color: #ccc;
     --point-color: #999;
+    --vector-color: #f59e0b;
+    --vector-label-bg: rgba(20,8,0,0.80);
+    --selection-glow: rgba(34, 197, 94, 0.7);
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
   }
+}
+
+/* Manual light override */
+html[data-theme="light"] {
+  --bg: #f5f5f5;
+  --bg-surface: #ffffff;
+  --text: #1a1a2e;
+  --text-secondary: #666;
+  --border: #ddd;
+  --grid-color: #c8c8c8;
+  --segment-color: #333;
+  --point-color: #666;
+  --vector-color: #d97706;
+  --vector-label-bg: rgba(20,8,0,0.80);
+  --selection-glow: rgba(22, 163, 74, 0.8);
+}
+
+/* Manual dark override */
+html[data-theme="dark"] {
+  --bg: #1a1a2e;
+  --bg-surface: #16213e;
+  --text: #e0e0e0;
+  --text-secondary: #999;
+  --border: #333;
+  --grid-color: #3d3d56;
+  --segment-color: #ccc;
+  --point-color: #999;
+  --vector-color: #f59e0b;
+  --vector-label-bg: rgba(20,8,0,0.80);
+  --selection-glow: rgba(34, 197, 94, 0.7);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 html, body, #root {
@@ -54,4 +96,9 @@ input, button, select {
 
 button {
   cursor: pointer;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

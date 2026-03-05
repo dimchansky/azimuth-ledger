@@ -149,10 +149,19 @@ function RouteEntry({
       <div
         className={`${styles.entryHeader} ${isPointSelected ? styles.entryHeaderSelected : ''}`}
         data-map-point={pointIndex}
+        role="button"
+        tabIndex={0}
         onClick={togglePoint}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            togglePoint();
+          }
+        }}
       >
         {isPointSelected && <span className={styles.selectionTag}>POINT</span>}
-        <span className={styles.pointBadge} style={{ background: badgeColor }}>
+        <span className={styles.pointBadge} style={{ background: badgeColor }}
+          onClick={isPointSelected ? (e) => e.stopPropagation() : undefined}>
           {pointIndex}
         </span>
 
@@ -184,8 +193,10 @@ function RouteEntry({
         )}
 
         <div className={styles.chipGroup} onClick={(e) => e.stopPropagation()}>
-          <span
+          <button
+            type="button"
             className={`${styles.chip} ${isFromActive ? styles.chipFromActive : styles.chipFromInactive}`}
+            aria-pressed={isFromActive}
             onClick={() => {
               if (isToActive) {
                 setSelection({ fromIndex: pointIndex, toIndex: selection.fromIndex });
@@ -195,9 +206,11 @@ function RouteEntry({
             }}
           >
             FROM
-          </span>
-          <span
+          </button>
+          <button
+            type="button"
             className={`${styles.chip} ${isToActive ? styles.chipToActive : styles.chipToInactive}`}
+            aria-pressed={isToActive}
             onClick={() => {
               if (isFromActive) {
                 setSelection({ fromIndex: selection.toIndex, toIndex: pointIndex });
@@ -207,7 +220,7 @@ function RouteEntry({
             }}
           >
             TO
-          </span>
+          </button>
         </div>
       </div>
 
@@ -216,14 +229,22 @@ function RouteEntry({
         <div
           className={`${styles.entryLeg} ${isLegSelected ? styles.entryLegSelected : ''}`}
           data-map-leg={outgoingSegmentIndex}
+          role="button"
+          tabIndex={0}
           onClick={toggleLeg}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleLeg();
+            }
+          }}
         >
           {isLegSelected && <span className={`${styles.selectionTag} ${styles.selectionTagLeg}`}>LEG</span>}
           <div className={styles.legConnector}>
             <div className={styles.legConnectorLine} />
             <div className={styles.legConnectorArrow} />
           </div>
-          <div className={styles.legContent}>
+          <div className={styles.legContent} onClick={isLegSelected ? (e) => e.stopPropagation() : undefined}>
             <div className={styles.legPrimary}>
               {/* MAG value */}
               {editingField === 'azimuth' ? (
