@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar/Sidebar';
 import { MapView } from './components/MapView/MapView';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { useThemeEffect } from './hooks/useThemeEffect';
+import { ReloadPrompt } from './components/ReloadPrompt/ReloadPrompt';
 import { useState, useRef } from 'react';
 
 export function App() {
@@ -55,6 +56,7 @@ export function App() {
       <div className={styles.map}>
         <MapView />
       </div>
+      <ReloadPrompt />
     </div>
   );
 }
