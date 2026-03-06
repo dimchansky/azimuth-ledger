@@ -20,6 +20,11 @@ export function trueToMagnetic(trueDeg: number, decl: number): number {
   return normalizeDeg(trueDeg - decl);
 }
 
+export function formatNum(n: number): string {
+  const s = n.toFixed(1);
+  return s.endsWith('.0') ? s.slice(0, -2) : s;
+}
+
 export function degreesToMils(deg: number, M: number): number {
   return deg * M / 360;
 }

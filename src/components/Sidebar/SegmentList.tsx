@@ -3,14 +3,9 @@ import type { Segment, AngleUnit } from '../../domain/types';
 import { useRouteStore } from '../../store/routeStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useMapSelectionStore } from '../../store/mapSelectionStore';
-import { computePoints, computeVector, degreesToMils, magneticToTrue, milsToDegrees, normalizeAngle } from '../../domain/navigation';
+import { computePoints, computeVector, degreesToMils, formatNum, magneticToTrue, milsToDegrees, normalizeAngle } from '../../domain/navigation';
 import { getPointColor } from '../../theme/colors';
 import styles from './Sidebar.module.css';
-
-function formatNum(n: number): string {
-  const s = n.toFixed(1);
-  return s.endsWith('.0') ? s.slice(0, -2) : s;
-}
 
 function formatAz(deg: number, unit: AngleUnit, M: number): string {
   if (unit === 'mils') return `${Math.round(degreesToMils(deg, M))} mil`;
@@ -377,10 +372,10 @@ export function SegmentList() {
           <div className={styles.sectionHeader}>Direct Vector</div>
           <div className={styles.vectorInfo}>
             <div className={styles.vectorHeader}>
-              <span className={styles.pointBadgeSm} style={{ background: 'var(--from-color)' }}>{selection.fromIndex}</span>
+              <span className={styles.pointBadge} style={{ background: 'var(--from-color)' }}>{selection.fromIndex}</span>
               {from.label && <span className={styles.vectorPointLabel}>{from.label}</span>}
               <span className={styles.vectorArrow}>&rarr;</span>
-              <span className={styles.pointBadgeSm} style={{ background: 'var(--to-color)' }}>{selection.toIndex}</span>
+              <span className={styles.pointBadge} style={{ background: 'var(--to-color)' }}>{selection.toIndex}</span>
               {to.label && <span className={styles.vectorPointLabel}>{to.label}</span>}
             </div>
             <div className={styles.vectorPrimary}>

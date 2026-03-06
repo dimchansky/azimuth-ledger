@@ -224,22 +224,10 @@
   align-items: center;
   justify-content: center;
   color: #fff;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
-}
-
-.pointBadgeSm {
-  display: inline-flex;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  vertical-align: middle;
 }
 
 /* RouteEntry */

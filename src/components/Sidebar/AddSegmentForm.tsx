@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { useRouteStore } from '../../store/routeStore';
 import { useSettingsStore } from '../../store/settingsStore';
-import { normalizeAngle, milsToDegrees } from '../../domain/navigation';
+import { useAddLegFormStore } from '../../store/addLegFormStore';
+import { normalizeAngle, milsToDegrees, degreesToMils, formatNum } from '../../domain/navigation';
 import styles from './Sidebar.module.css';
 
 /** Parse a numeric string, accepting both '.' and ',' as decimal separators. */
@@ -15,10 +16,35 @@ export function AddSegmentForm() {
   const angleUnit = useSettingsStore((s) => s.angleUnit);
   const milsPerCircle = useSettingsStore((s) => s.milsPerCircle);
 
-  const [azimuth, setAzimuth] = useState('');
-  const [length, setLength] = useState('');
-  const [label, setLabel] = useState('');
+  const azimuth = useAddLegFormStore((s) => s.azimuth);
+  const length = useAddLegFormStore((s) => s.length);
+  const label = useAddLegFormStore((s) => s.label);
+  const lastAngleUnit = useAddLegFormStore((s) => s.lastAngleUnit);
+  const setAzimuth = useAddLegFormStore((s) => s.setAzimuth);
+  const setLength = useAddLegFormStore((s) => s.setLength);
+  const setLabel = useAddLegFormStore((s) => s.setLabel);
+  const setLastAngleUnit = useAddLegFormStore((s) => s.setLastAngleUnit);
+  const clearForm = useAddLegFormStore((s) => s.clearForm);
+
   const [error, setError] = useState('');
+
+  // Recalculate azimuth when angle unit changes
+  useEffect(() => {
+    if (angleUnit === lastAngleUnit) return;
+
+    if (azimuth.trim() !== '') {
+      const val = parseNumber(azimuth);
+      if (!isNaN(val)) {
+        if (lastAngleUnit === 'degrees' && angleUnit === 'mils') {
+          setAzimuth(String(Math.round(degreesToMils(val, milsPerCircle))));
+        } else if (lastAngleUnit === 'mils' && angleUnit === 'degrees') {
+          setAzimuth(formatNum(milsToDegrees(val, milsPerCircle)));
+        }
+      }
+    }
+
+    setLastAngleUnit(angleUnit);
+  }, [angleUnit, lastAngleUnit, azimuth, milsPerCircle, setAzimuth, setLastAngleUnit]);
 
   const unitLabel = angleUnit === 'degrees' ? '°' : ' mil';
   const maxVal = angleUnit === 'degrees' ? 360 : milsPerCircle;
@@ -52,9 +78,7 @@ export function AddSegmentForm() {
 
     addSegment(azDeg, lenVal, pointLabel.slice(0, 20));
 
-    setAzimuth('');
-    setLength('');
-    setLabel('');
+    clearForm();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
