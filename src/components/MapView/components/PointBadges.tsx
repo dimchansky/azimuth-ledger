@@ -12,7 +12,7 @@ interface PointBadgesProps {
 
 const BADGE_RADIUS_PX = 10;
 const FONT_SIZE_PX = 12;
-const LABEL_FONT_SIZE_PX = 8.5;
+const LABEL_FONT_SIZE_PX = 12;
 
 export function PointBadges({ points, selection, selectedPointIndex, scale, sizeScale }: PointBadgesProps) {
   const sw = sizeScale;
@@ -57,10 +57,12 @@ export function PointBadges({ points, selection, selectedPointIndex, scale, size
               fontFamily="system-ui, sans-serif"
               fontStyle="bold"
               fill="#fff"
+              width={r * 2}
+              height={fontSize}
               align="center"
               verticalAlign="middle"
-              offsetX={fontSize * 0.3}
-              offsetY={fontSize * 0.45}
+              offsetX={r}
+              offsetY={fontSize / 2}
               listening={false}
             />
             {/* Point label */}
