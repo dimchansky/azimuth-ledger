@@ -1,7 +1,12 @@
+import { useCallback } from 'react';
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { useSettingsStore } from '../../store/settingsStore';
 import type { ThemePreference } from '../../store/settingsStore';
+import { useNumericField } from '../../hooks/useNumericField';
 import styles from './Sidebar.module.css';
+
+const validatePositiveInt = (v: number) => Number.isInteger(v) && v > 0;
+const validatePositive = (v: number) => isFinite(v) && v > 0;
 
 export function SettingsPanel() {
   const declinationDeg = useSettingsStore((s) => s.declinationDeg);
@@ -16,6 +21,24 @@ export function SettingsPanel() {
   const setGridStep = useSettingsStore((s) => s.setGridStep);
   const setUnitsLabel = useSettingsStore((s) => s.setUnitsLabel);
   const setThemePreference = useSettingsStore((s) => s.setThemePreference);
+
+  const formatMils = useCallback((v: number) => String(Math.round(v)), []);
+
+  const declination = useNumericField({
+    storeValue: declinationDeg,
+    onCommit: setDeclinationDeg,
+  });
+  const mils = useNumericField({
+    storeValue: milsPerCircle,
+    onCommit: setMilsPerCircle,
+    format: formatMils,
+    validate: validatePositiveInt,
+  });
+  const grid = useNumericField({
+    storeValue: gridStep,
+    onCommit: setGridStep,
+    validate: validatePositive,
+  });
 
   return (
     <Collapsible.Root className={styles.settingsPanel}>
@@ -39,10 +62,7 @@ export function SettingsPanel() {
           <label className={styles.settingRow}>
             <span>Declination (°)</span>
             <input
-              type="number"
-              value={declinationDeg}
-              onChange={(e) => setDeclinationDeg(parseFloat(e.target.value) || 0)}
-              step="0.1"
+              {...declination.inputProps}
               className={styles.settingInput}
             />
           </label>
@@ -60,26 +80,14 @@ export function SettingsPanel() {
           <label className={styles.settingRow}>
             <span>Mils per circle</span>
             <input
-              type="number"
-              value={milsPerCircle}
-              onChange={(e) => {
-                const v = parseInt(e.target.value);
-                if (v > 0) setMilsPerCircle(v);
-              }}
+              {...mils.inputProps}
               className={styles.settingInput}
             />
           </label>
           <label className={styles.settingRow}>
             <span>Grid step</span>
             <input
-              type="number"
-              value={gridStep}
-              onChange={(e) => {
-                const v = parseFloat(e.target.value);
-                if (v > 0) setGridStep(v);
-              }}
-              step="any"
-              min="1"
+              {...grid.inputProps}
               className={styles.settingInput}
             />
           </label>

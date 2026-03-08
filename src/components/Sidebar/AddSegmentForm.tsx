@@ -4,12 +4,8 @@ import { useRouteStore } from '../../store/routeStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useAddLegFormStore } from '../../store/addLegFormStore';
 import { normalizeAngle, milsToDegrees, degreesToMils, formatNum } from '../../domain/navigation';
+import { parseNumber } from '../../utils/parseNumber';
 import styles from './Sidebar.module.css';
-
-/** Parse a numeric string, accepting both '.' and ',' as decimal separators. */
-function parseNumber(raw: string): number {
-  return parseFloat(raw.replace(',', '.'));
-}
 
 export function AddSegmentForm() {
   const addSegment = useRouteStore((s) => s.addSegment);

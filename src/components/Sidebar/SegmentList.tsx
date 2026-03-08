@@ -4,6 +4,7 @@ import { useRouteStore } from '../../store/routeStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useMapSelectionStore } from '../../store/mapSelectionStore';
 import { computePoints, computeVector, degreesToMils, formatNum, magneticToTrue, milsToDegrees, normalizeAngle } from '../../domain/navigation';
+import { parseNumber } from '../../utils/parseNumber';
 import { getPointColor } from '../../theme/colors';
 import styles from './Sidebar.module.css';
 
@@ -100,7 +101,7 @@ function RouteEntry({
     if (!editingField || !outgoingSegment) return;
 
     if (editingField === 'azimuth') {
-      const val = parseFloat(editValue);
+      const val = parseNumber(editValue);
       if (!isNaN(val)) {
         const deg = angleUnit === 'mils'
           ? normalizeAngle(milsToDegrees(val, milsPerCircle), 'degrees')
@@ -108,7 +109,7 @@ function RouteEntry({
         updateSegment(outgoingSegment.id, { magneticAzimuth: deg });
       }
     } else if (editingField === 'length') {
-      const val = parseFloat(editValue);
+      const val = parseNumber(editValue);
       if (!isNaN(val) && val > 0) {
         updateSegment(outgoingSegment.id, { length: val });
       }
@@ -250,8 +251,8 @@ function RouteEntry({
                   onBlur={commitEdit}
                   onKeyDown={handleKeyDown}
                   onClick={(e) => e.stopPropagation()}
-                  type="number"
-                  step="any"
+                  type="text"
+                  inputMode="decimal"
                   autoFocus
                 />
               ) : (
@@ -281,9 +282,8 @@ function RouteEntry({
                   onBlur={commitEdit}
                   onKeyDown={handleKeyDown}
                   onClick={(e) => e.stopPropagation()}
-                  type="number"
-                  step="any"
-                  min="0"
+                  type="text"
+                  inputMode="decimal"
                   autoFocus
                 />
               ) : (

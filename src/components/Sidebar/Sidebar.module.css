@@ -58,7 +58,7 @@
 .input {
   flex: 1;
   padding: 6px 8px;
-  min-height: 44px;
+  min-height: 36px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
@@ -92,7 +92,7 @@
 
 .btnPrimary {
   padding: 6px 14px;
-  min-height: 44px;
+  min-height: 36px;
   border: none;
   border-radius: var(--radius);
   background: var(--accent);
@@ -589,6 +589,11 @@
   .entryLabelInput,
   .legInlineInput {
     font-size: 16px;
+  }
+
+  .input,
+  .btnPrimary {
+    min-height: 44px;
   }
 }
 
