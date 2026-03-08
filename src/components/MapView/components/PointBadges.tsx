@@ -7,23 +7,18 @@ interface PointBadgesProps {
   selection: Selection;
   selectedPointIndex: number | null;
   scale: number;
+  sizeScale: number;
 }
 
-const BASE_BADGE_RADIUS = 8;
-const MIN_BADGE_RADIUS_PX = 10;
-const MIN_FONT_SIZE_PX = 10;
+const BADGE_RADIUS_PX = 10;
+const FONT_SIZE_PX = 12;
+const LABEL_FONT_SIZE_PX = 8.5;
 
-function worldSize(base: number, scale: number, minPx: number): number {
-  return Math.max(base * scale, minPx);
-}
-
-export function PointBadges({ points, selection, selectedPointIndex, scale }: PointBadgesProps) {
-  const badgeR = worldSize(BASE_BADGE_RADIUS, scale, MIN_BADGE_RADIUS_PX);
-  const screenR = badgeR / scale;
-  const fontSize = Math.max(badgeR * 1.2, MIN_FONT_SIZE_PX);
-  const screenFontSize = fontSize / scale;
-  const labelFontSize = Math.max(badgeR * 0.7, MIN_FONT_SIZE_PX * 0.85);
-  const screenLabelFontSize = labelFontSize / scale;
+export function PointBadges({ points, selection, selectedPointIndex, scale, sizeScale }: PointBadgesProps) {
+  const sw = sizeScale;
+  const screenR = BADGE_RADIUS_PX * sw / scale;
+  const screenFontSize = FONT_SIZE_PX * sw / scale;
+  const screenLabelFontSize = LABEL_FONT_SIZE_PX * sw / scale;
 
   return (
     <Group>
@@ -31,6 +26,7 @@ export function PointBadges({ points, selection, selectedPointIndex, scale }: Po
         const color = getPointColor(p.index, selection);
         const isSelected = selectedPointIndex === p.index;
         const r = isSelected ? screenR * 1.4 : screenR;
+        const fontSize = isSelected ? screenFontSize * 1.4 : screenFontSize;
         const hasOuterRing = p.index === selection.fromIndex || p.index === selection.toIndex;
 
         return (
@@ -49,7 +45,7 @@ export function PointBadges({ points, selection, selectedPointIndex, scale }: Po
               radius={r}
               fill={color}
               shadowColor={isSelected ? selectionGlowColor() : undefined}
-              shadowBlur={isSelected ? badgeR : 0}
+              shadowBlur={isSelected ? BADGE_RADIUS_PX * sw / scale : 0}
               shadowEnabled={isSelected}
               hitStrokeWidth={10 / scale}
               name={`point-${p.index}`}
@@ -57,14 +53,14 @@ export function PointBadges({ points, selection, selectedPointIndex, scale }: Po
             {/* Index number */}
             <Text
               text={String(p.index)}
-              fontSize={screenFontSize}
+              fontSize={fontSize}
               fontFamily="system-ui, sans-serif"
               fontStyle="bold"
               fill="#fff"
               align="center"
               verticalAlign="middle"
-              offsetX={screenFontSize * 0.3}
-              offsetY={screenFontSize * 0.45}
+              offsetX={fontSize * 0.3}
+              offsetY={fontSize * 0.45}
               listening={false}
             />
             {/* Point label */}

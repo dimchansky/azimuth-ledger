@@ -169,6 +169,7 @@ function RouteEntry({
             onChange={(e) => onPointLabelChange(e.target.value.slice(0, 20))}
             onBlur={() => setEditingLabel(false)}
             onKeyDown={(e) => {
+              e.stopPropagation();
               if (e.key === 'Enter' || e.key === 'Escape') setEditingLabel(false);
             }}
             maxLength={20}

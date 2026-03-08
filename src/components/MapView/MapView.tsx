@@ -65,6 +65,7 @@ export function MapView() {
   // Stage dimensions in CSS pixels — Konva handles DPR via pixelRatio
   const stageW = containerSize.w;
   const stageH = containerSize.h;
+  const sizeScale = stageW > 768 ? 1.3 : 1;
 
   const handleFit = useCallback(() => {
     const container = containerRef.current;
@@ -317,17 +318,20 @@ export function MapView() {
               points={points}
               selectedLegIndex={selectedLegIndex}
               scale={scale}
+              sizeScale={sizeScale}
             />
             <FromToVectorArrow
               points={points}
               selection={selection}
               scale={scale}
+              sizeScale={sizeScale}
             />
             <PointBadges
               points={points}
               selection={selection}
               selectedPointIndex={selectedPointIndex}
               scale={scale}
+              sizeScale={sizeScale}
             />
           </Layer>
 
@@ -341,6 +345,7 @@ export function MapView() {
               milsPerCircle={milsPerCircle}
               unitsLabel={unitsLabel}
               scale={scale}
+              sizeScale={sizeScale}
               stageWidth={stageW}
               stageHeight={stageH}
               offsetX={offsetX}
@@ -350,6 +355,7 @@ export function MapView() {
               points={points}
               selectedLegIndex={selectedLegIndex}
               scale={scale}
+              sizeScale={sizeScale}
               segments={segments}
               segmentAzimuths={segmentAzimuths}
               angleUnit={angleUnit}

@@ -9,10 +9,7 @@ interface RouteSegmentsProps {
   points: Point[];
   selectedLegIndex: number | null;
   scale: number;
-}
-
-function worldSize(base: number, scale: number, minPx: number): number {
-  return Math.max(base * scale, minPx);
+  sizeScale: number;
 }
 
 function formatNum(n: number): string {
@@ -27,20 +24,19 @@ function formatAzimuth(deg: number, unit: AngleUnit, M: number): string {
   return `${formatNum(deg)}\u00B0`;
 }
 
-const BASE_ROUTE_WIDTH = 3;
-const BASE_ARROWHEAD_LEN = 12;
-const MIN_ROUTE_WIDTH_PX = 3;
+const ROUTE_WIDTH_PX = 3;
+const ARROWHEAD_PX = 12;
+const LABEL_FONT_PX = 12;
 
 export function RouteSegments({
   points,
   selectedLegIndex,
   scale,
+  sizeScale,
 }: RouteSegmentsProps) {
   if (points.length < 2) return null;
 
-  const lineWidth = worldSize(BASE_ROUTE_WIDTH, scale, MIN_ROUTE_WIDTH_PX);
-  const arrowLen = worldSize(BASE_ARROWHEAD_LEN, scale, 10);
-
+  const sw = sizeScale;
   const legs: React.ReactNode[] = [];
 
   for (let i = 0; i < points.length - 1; i++) {
@@ -48,21 +44,21 @@ export function RouteSegments({
     const p2 = points[i + 1];
     const isSelected = i === selectedLegIndex;
     const color = isSelected ? SELECTED_LEG_COLOR : ROUTE_COLOR;
-    const w = isSelected ? lineWidth * 2 : lineWidth;
+    const w = isSelected ? ROUTE_WIDTH_PX * 2 : ROUTE_WIDTH_PX;
     const dx = p2.x - p1.x;
     const dy = p2.y - p1.y;
     const segLen = Math.sqrt(dx * dx + dy * dy) * scale;
-    const showArrow = segLen > arrowLen * 1.5;
+    const showArrow = segLen > ARROWHEAD_PX * sw * 1.5;
 
     legs.push(
       <Arrow
         key={`leg-${i}`}
         points={[p1.x, -p1.y, p2.x, -p2.y]}
         stroke={color}
-        strokeWidth={w / scale}
+        strokeWidth={w * sw / scale}
         fill={color}
-        pointerLength={showArrow ? arrowLen / scale : 0}
-        pointerWidth={showArrow ? arrowLen / scale : 0}
+        pointerLength={showArrow ? ARROWHEAD_PX * sw / scale : 0}
+        pointerWidth={showArrow ? ARROWHEAD_PX * sw / scale : 0}
         lineCap="round"
         hitStrokeWidth={20 / scale}
         name={`leg-${i}`}
@@ -77,6 +73,7 @@ interface SelectedLegCardProps {
   points: Point[];
   selectedLegIndex: number | null;
   scale: number;
+  sizeScale: number;
   segments: Segment[];
   segmentAzimuths: { magneticAzimuth: number; trueAzimuth: number }[];
   angleUnit: AngleUnit;
@@ -92,6 +89,7 @@ export function SelectedLegCard({
   points,
   selectedLegIndex,
   scale,
+  sizeScale,
   segments,
   segmentAzimuths,
   angleUnit,
@@ -119,7 +117,7 @@ export function SelectedLegCard({
   const lengthPart = unitsLabel ? `${lengthVal}\u00A0${unitsLabel}` : lengthVal;
   const label = `MAG ${azStr} \u00B7 ${lengthPart}`;
 
-  const fontSize = worldSize(9, scale, 10);
+  const fontSize = LABEL_FONT_PX * sizeScale;
 
   return (
     <Shape

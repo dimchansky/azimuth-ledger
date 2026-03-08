@@ -3,10 +3,6 @@ import type { Point, Selection, AngleUnit } from '../../../domain/types';
 import { computeVector, degreesToMils } from '../../../domain/navigation';
 import { vectorColor, vectorLabelBg } from '../../../theme/colors';
 
-function worldSize(base: number, scale: number, minPx: number): number {
-  return Math.max(base * scale, minPx);
-}
-
 function formatNum(n: number): string {
   const s = n.toFixed(1);
   return s.endsWith('.0') ? s.slice(0, -2) : s;
@@ -19,18 +15,18 @@ function formatAzimuth(deg: number, unit: AngleUnit, M: number): string {
   return `${formatNum(deg)}\u00B0`;
 }
 
-const BASE_ROUTE_WIDTH = 3;
-const BASE_ARROWHEAD_LEN = 12;
-const BASE_FONT_SIZE = 10;
-const MIN_FONT_SIZE_PX = 10;
+const LINE_WIDTH_PX = 2.5;
+const ARROW_PX = 14;
+const LABEL_FONT_PX = 12;
 
 interface FromToVectorArrowProps {
   points: Point[];
   selection: Selection;
   scale: number;
+  sizeScale: number;
 }
 
-export function FromToVectorArrow({ points, selection, scale }: FromToVectorArrowProps) {
+export function FromToVectorArrow({ points, selection, scale, sizeScale }: FromToVectorArrowProps) {
   if (selection.fromIndex === selection.toIndex) return null;
 
   const from = points[selection.fromIndex];
@@ -41,23 +37,22 @@ export function FromToVectorArrow({ points, selection, scale }: FromToVectorArro
   if (dist < 1e-10) return null;
 
   const vecCol = vectorColor();
-  const lineWidth = worldSize(BASE_ROUTE_WIDTH * 0.8, scale, 2);
-  const arrowLen = worldSize(BASE_ARROWHEAD_LEN * 1.2, scale, 14);
+  const sw = sizeScale;
   const segLen = dist * scale;
-  const showArrow = segLen > arrowLen * 1.5;
+  const showArrow = segLen > ARROW_PX * sw * 1.5;
 
-  const dashVal = lineWidth * 4 / scale;
-  const gapVal = lineWidth * 3 / scale;
+  const dashVal = LINE_WIDTH_PX * sw * 4 / scale;
+  const gapVal = LINE_WIDTH_PX * sw * 3 / scale;
 
   return (
     <Arrow
       points={[from.x, -from.y, to.x, -to.y]}
       stroke={vecCol}
-      strokeWidth={lineWidth / scale}
+      strokeWidth={LINE_WIDTH_PX * sw / scale}
       fill={vecCol}
       dash={[dashVal, gapVal]}
-      pointerLength={showArrow ? arrowLen / scale : 0}
-      pointerWidth={showArrow ? arrowLen / scale : 0}
+      pointerLength={showArrow ? ARROW_PX * sw / scale : 0}
+      pointerWidth={showArrow ? ARROW_PX * sw / scale : 0}
       lineCap="round"
       listening={false}
     />
@@ -72,6 +67,7 @@ interface FromToVectorLabelProps {
   milsPerCircle: number;
   unitsLabel: string;
   scale: number;
+  sizeScale: number;
   stageWidth: number;
   stageHeight: number;
   offsetX: number;
@@ -86,6 +82,7 @@ export function FromToVectorLabel({
   milsPerCircle,
   unitsLabel,
   scale,
+  sizeScale,
   stageWidth,
   stageHeight,
   offsetX,
@@ -112,15 +109,14 @@ export function FromToVectorLabel({
   const distDisplay = unitsLabel ? `${distStr}\u00A0${unitsLabel}` : distStr;
   const labelText = `MAG ${azStr} \u00B7 ${distDisplay}`;
 
-  const fontSize = worldSize(BASE_FONT_SIZE, scale, MIN_FONT_SIZE_PX);
+  const fontSize = LABEL_FONT_PX * sizeScale;
 
   return (
     <Shape
       sceneFunc={(context) => {
         const ctx = context._context;
         const vecLabelBgColor = vectorLabelBg();
-        const labelFontSize = fontSize * 0.9;
-        ctx.font = `bold ${labelFontSize}px system-ui, sans-serif`;
+        ctx.font = `bold ${fontSize}px system-ui, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         const textW = ctx.measureText(labelText).width;
@@ -130,9 +126,9 @@ export function FromToVectorLabel({
         ctx.beginPath();
         ctx.roundRect(
           mx - textW / 2 - padX,
-          my - labelFontSize / 2 - padY,
+          my - fontSize / 2 - padY,
           textW + padX * 2,
-          labelFontSize + padY * 2,
+          fontSize + padY * 2,
           3,
         );
         ctx.fill();
