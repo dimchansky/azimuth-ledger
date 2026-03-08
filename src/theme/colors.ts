@@ -8,6 +8,8 @@ export function toColor(): string { return cssVar('--to-color'); }
 export function pointColor(): string { return cssVar('--point-color'); }
 export function segmentColor(): string { return cssVar('--segment-color'); }
 export function gridColor(): string { return cssVar('--grid-color'); }
+export function routeColor(): string { return cssVar('--route-color'); }
+export function routeColorSelected(): string { return cssVar('--route-color-selected'); }
 export function vectorColor(): string { return cssVar('--vector-color'); }
 export function vectorLabelBg(): string { return cssVar('--vector-label-bg'); }
 export function selectionGlowColor(): string { return cssVar('--selection-glow'); }

@@ -21,6 +21,8 @@
   --segment-color: #333;
   --grid-color: #c8c8c8;
   --point-color: #666;
+  --route-color: #22c55e;
+  --route-color-selected: #4ade80;
   --vector-color: #d97706;
   --vector-label-bg: rgba(20,8,0,0.80);
   --radius: 6px;
@@ -43,6 +45,8 @@
     --grid-color: #3d3d56;
     --segment-color: #ccc;
     --point-color: #999;
+    --route-color: #22c55e;
+    --route-color-selected: #4ade80;
     --vector-color: #f59e0b;
     --vector-label-bg: rgba(20,8,0,0.80);
     --selection-glow: rgba(34, 197, 94, 0.7);
@@ -60,6 +64,8 @@ html[data-theme="light"] {
   --grid-color: #c8c8c8;
   --segment-color: #333;
   --point-color: #666;
+  --route-color: #22c55e;
+  --route-color-selected: #4ade80;
   --vector-color: #d97706;
   --vector-label-bg: rgba(20,8,0,0.80);
   --selection-glow: rgba(22, 163, 74, 0.8);
@@ -75,6 +81,8 @@ html[data-theme="dark"] {
   --grid-color: #3d3d56;
   --segment-color: #ccc;
   --point-color: #999;
+  --route-color: #22c55e;
+  --route-color-selected: #4ade80;
   --vector-color: #f59e0b;
   --vector-label-bg: rgba(20,8,0,0.80);
   --selection-glow: rgba(34, 197, 94, 0.7);

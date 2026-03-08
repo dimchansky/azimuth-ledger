@@ -375,7 +375,7 @@ export function SegmentList() {
             <div className={styles.vectorHeader}>
               <span className={styles.pointBadge} style={{ background: 'var(--from-color)' }}>{selection.fromIndex}</span>
               {from.label && <span className={styles.vectorPointLabel}>{from.label}</span>}
-              <span className={styles.vectorArrow}>&rarr;</span>
+              <span className={styles.vectorArrow} />
               <span className={styles.pointBadge} style={{ background: 'var(--to-color)' }}>{selection.toIndex}</span>
               {to.label && <span className={styles.vectorPointLabel}>{to.label}</span>}
             </div>

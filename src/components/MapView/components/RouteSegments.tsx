@@ -1,10 +1,8 @@
 import { Group, Arrow, Shape } from 'react-konva';
 import type { Point, Segment, Selection, AngleUnit } from '../../../domain/types';
 import { degreesToMils } from '../../../domain/navigation';
+import { routeColor, routeColorSelected } from '../../../theme/colors';
 import { pointInsetRadius, insetSegment } from '../constants';
-
-const ROUTE_COLOR = '#22c55e';
-const SELECTED_LEG_COLOR = '#4ade80';
 
 interface RouteSegmentsProps {
   points: Point[];
@@ -40,6 +38,8 @@ export function RouteSegments({
   if (points.length < 2) return null;
 
   const sw = sizeScale;
+  const ROUTE_COLOR = routeColor();
+  const SELECTED_LEG_COLOR = routeColorSelected();
   const legs: React.ReactNode[] = [];
 
   for (let i = 0; i < points.length - 1; i++) {
@@ -147,7 +147,7 @@ export function SelectedLegCard({
         ctx.lineWidth = 0.5;
         ctx.stroke();
 
-        ctx.fillStyle = SELECTED_LEG_COLOR;
+        ctx.fillStyle = routeColorSelected();
         ctx.fillText(label, mx, my + 1);
       }}
       listening={false}
