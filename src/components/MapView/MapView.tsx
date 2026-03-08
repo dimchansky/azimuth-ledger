@@ -316,6 +316,7 @@ export function MapView() {
           >
             <RouteSegments
               points={points}
+              selection={selection}
               selectedLegIndex={selectedLegIndex}
               scale={scale}
               sizeScale={sizeScale}

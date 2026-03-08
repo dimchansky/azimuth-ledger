@@ -1,12 +1,14 @@
 import { Group, Arrow, Shape } from 'react-konva';
-import type { Point, Segment, AngleUnit } from '../../../domain/types';
+import type { Point, Segment, Selection, AngleUnit } from '../../../domain/types';
 import { degreesToMils } from '../../../domain/navigation';
+import { pointInsetRadius, insetSegment } from '../constants';
 
 const ROUTE_COLOR = '#22c55e';
 const SELECTED_LEG_COLOR = '#4ade80';
 
 interface RouteSegmentsProps {
   points: Point[];
+  selection: Selection;
   selectedLegIndex: number | null;
   scale: number;
   sizeScale: number;
@@ -30,6 +32,7 @@ const LABEL_FONT_PX = 12;
 
 export function RouteSegments({
   points,
+  selection,
   selectedLegIndex,
   scale,
   sizeScale,
@@ -42,18 +45,22 @@ export function RouteSegments({
   for (let i = 0; i < points.length - 1; i++) {
     const p1 = points[i];
     const p2 = points[i + 1];
+
+    const r1 = pointInsetRadius(p1.index, selection, scale, sizeScale);
+    const r2 = pointInsetRadius(p2.index, selection, scale, sizeScale);
+    const inset = insetSegment(p1.x, -p1.y, p2.x, -p2.y, r1, r2);
+    if (!inset) continue;
+
     const isSelected = i === selectedLegIndex;
     const color = isSelected ? SELECTED_LEG_COLOR : ROUTE_COLOR;
     const w = isSelected ? ROUTE_WIDTH_PX * 2 : ROUTE_WIDTH_PX;
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
-    const segLen = Math.sqrt(dx * dx + dy * dy) * scale;
-    const showArrow = segLen > ARROWHEAD_PX * sw * 1.5;
+    const screenLen = inset.len * scale;
+    const showArrow = screenLen > ARROWHEAD_PX * sw * 1.5;
 
     legs.push(
       <Arrow
         key={`leg-${i}`}
-        points={[p1.x, -p1.y, p2.x, -p2.y]}
+        points={[inset.x1, inset.y1, inset.x2, inset.y2]}
         stroke={color}
         strokeWidth={w * sw / scale}
         fill={color}

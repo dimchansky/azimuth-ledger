@@ -2,6 +2,7 @@ import { Arrow, Shape } from 'react-konva';
 import type { Point, Selection, AngleUnit } from '../../../domain/types';
 import { computeVector, degreesToMils } from '../../../domain/navigation';
 import { vectorColor, vectorLabelBg } from '../../../theme/colors';
+import { pointInsetRadius, insetSegment } from '../constants';
 
 function formatNum(n: number): string {
   const s = n.toFixed(1);
@@ -33,20 +34,22 @@ export function FromToVectorArrow({ points, selection, scale, sizeScale }: FromT
   const to = points[selection.toIndex];
   if (!from || !to) return null;
 
-  const dist = Math.hypot(to.x - from.x, to.y - from.y);
-  if (dist < 1e-10) return null;
+  const r1 = pointInsetRadius(from.index, selection, scale, sizeScale);
+  const r2 = pointInsetRadius(to.index, selection, scale, sizeScale);
+  const inset = insetSegment(from.x, -from.y, to.x, -to.y, r1, r2);
+  if (!inset) return null;
 
   const vecCol = vectorColor();
   const sw = sizeScale;
-  const segLen = dist * scale;
-  const showArrow = segLen > ARROW_PX * sw * 1.5;
+  const screenLen = inset.len * scale;
+  const showArrow = screenLen > ARROW_PX * sw * 1.5;
 
   const dashVal = LINE_WIDTH_PX * sw * 4 / scale;
   const gapVal = LINE_WIDTH_PX * sw * 3 / scale;
 
   return (
     <Arrow
-      points={[from.x, -from.y, to.x, -to.y]}
+      points={[inset.x1, inset.y1, inset.x2, inset.y2]}
       stroke={vecCol}
       strokeWidth={LINE_WIDTH_PX * sw / scale}
       fill={vecCol}

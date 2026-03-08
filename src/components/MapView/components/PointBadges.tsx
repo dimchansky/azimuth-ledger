@@ -1,6 +1,7 @@
 import { Group, Circle, Text, Shape } from 'react-konva';
 import type { Point, Selection } from '../../../domain/types';
 import { getPointColor, selectionGlowColor } from '../../../theme/colors';
+import { BADGE_RADIUS_PX } from '../constants';
 
 interface PointBadgesProps {
   points: Point[];
@@ -9,8 +10,6 @@ interface PointBadgesProps {
   scale: number;
   sizeScale: number;
 }
-
-const BADGE_RADIUS_PX = 10;
 const FONT_SIZE_PX = 12;
 const LABEL_FONT_SIZE_PX = 12;
 
