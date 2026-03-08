@@ -1,4 +1,4 @@
-import { Group, Circle, Text, Shape } from 'react-konva';
+import { Group, Circle, Shape } from 'react-konva';
 import type { Point, Selection } from '../../../domain/types';
 import { getPointColor, selectionGlowColor } from '../../../theme/colors';
 import { BADGE_RADIUS_PX } from '../constants';
@@ -49,19 +49,22 @@ export function PointBadges({ points, selection, selectedPointIndex, scale, size
               hitStrokeWidth={10 / scale}
               name={`point-${p.index}`}
             />
-            {/* Index number */}
-            <Text
-              text={String(p.index)}
-              fontSize={fontSize}
-              fontFamily="system-ui, sans-serif"
-              fontStyle="bold"
-              fill="#fff"
-              width={r * 2}
-              height={fontSize}
-              align="center"
-              verticalAlign="middle"
-              offsetX={r}
-              offsetY={fontSize / 2}
+            {/* Index number — counter-scale so the font engine always sees
+               a stable screen-pixel size; avoids baseline drift at tiny
+               world-unit font sizes during zoom */}
+            <Shape
+              sceneFunc={(context) => {
+                const ctx = context._context;
+                ctx.save();
+                const inv = 1 / scale;
+                ctx.scale(inv, inv);
+                ctx.font = `bold ${fontSize * scale}px system-ui, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#fff';
+                ctx.fillText(String(p.index), 0, 0);
+                ctx.restore();
+              }}
               listening={false}
             />
             {/* Point label */}
